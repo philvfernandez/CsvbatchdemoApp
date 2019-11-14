@@ -3,10 +3,12 @@ package com.spring.howto.config;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -21,6 +23,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+
+import com.spring.howto.model.Employee;
 
 @Configuration
 @EnableBatchProcessing
@@ -56,6 +60,12 @@ public class BatchConfig {
 	}
 	
 	@Bean
+	public ItemProcessor<Employee, Employee>processor() {
+		return new DBLogProcessor();
+	}
+	
+	
+	@Bean
 	public FlatFileItemReader<Employee> reader() {
 		FlatFileItemReader<Employee> itemReader = new FlatFileItemReader<Employee>();
 		itemReader.setLineMapper(lineMapper());
@@ -87,13 +97,13 @@ public class BatchConfig {
 		return itemWriter;
 	}
 	
-	@Bean DataSource dataSource() {
-		EmbeddedDatabaseBuilder embeddedDataBaseBuilder = new EmbeddedDatabaseBuilder();
-		return embeddedDataBaseBuilder.addScript("classpath:org/springframework/batch/core/schema-drop-h2.sql")
-			   .addScript("classpath:org/springframework/batch/core/schema-h2.sql")
-			   .addScript("classpath:employee.sql")
-			   .setType(EmbeddedDatabaseType.H2)
-			   .build();						
-	}
-	
+	// @Bean
+    public DataSource dataSource(){
+        EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
+        return embeddedDatabaseBuilder.addScript("classpath:org/springframework/batch/core/schema-drop-h2.sql")
+                .addScript("classpath:org/springframework/batch/core/schema-h2.sql")
+                .addScript("classpath:employee.sql")
+                .setType(EmbeddedDatabaseType.H2)
+                .build();
+    }	
 }
