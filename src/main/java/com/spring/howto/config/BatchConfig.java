@@ -97,7 +97,8 @@ public class BatchConfig {
 		return itemWriter;
 	}
 	
-	// @Bean
+	@Bean
+	//@Autowired
     public DataSource dataSource(){
         EmbeddedDatabaseBuilder embeddedDatabaseBuilder = new EmbeddedDatabaseBuilder();
         return embeddedDatabaseBuilder.addScript("classpath:org/springframework/batch/core/schema-drop-h2.sql")
